@@ -1,0 +1,30 @@
+{
+  "name": "phoenix-socket",
+  "version": "1.0.4",
+  "description": "Socket API for accessing Phoenix Framework's Channels",
+  "main": "dist/socket.js",
+  "scripts": {
+    "build": "gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/mspanc/phoenix_socket.git"
+  },
+  "keywords": [
+    "phoenix",
+    "phoenixframework",
+    "socket",
+    "websockets"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mspanc/phoenix_socket/issues"
+  },
+  "homepage": "https://github.com/mspanc/phoenix_socket#readme",
+  "devDependencies": {
+    "babel-preset-es2015": "^6.1.18",
+    "gulp": "^3.9.0",
+    "gulp-babel": "^6.1.1"
+  }
+}
