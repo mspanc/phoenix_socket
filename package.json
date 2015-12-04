@@ -3,6 +3,7 @@
   "version": "1.0.4",
   "description": "Socket API for accessing Phoenix Framework's Channels",
   "main": "dist/socket.js",
+  "jsnext:main": "vendor/socket.js",
   "scripts": {
     "build": "gulp"
   },
