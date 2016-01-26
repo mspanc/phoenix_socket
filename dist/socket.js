@@ -51,8 +51,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 //
 // ## Joining
 //
-// Joining a channel with `channel.join(topic, params)`, binds the params to
-// `channel.params`. Subsequent rejoins will send up the modified params for
+// Creating a channel with `socket.channel(topic, params)`, binds the params to
+// `channel.params`, which are sent up on `channel.join()`.
+// Subsequent rejoins will send up the modified params for
 // updating authorization params, or passing up last_message_id information.
 // Successful joins receive an "ok" status, while unsuccessful joins
 // receive "error".
@@ -64,7 +65,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 // can be done with `channel.push(eventName, payload)` and we can optionally
 // receive responses from the push. Additionally, we can use
 // `receive("timeout", callback)` to abort waiting for our other `receive` hooks
-//  and take action after some period of waiting.
+//  and take action after some period of waiting. The default timeout is 5000ms.
 //
 //
 // ## Socket Hooks
@@ -278,7 +279,7 @@ var Channel = exports.Channel = (function () {
     this.onError(function (reason) {
       _this2.socket.log("channel", "error " + _this2.topic, reason);
       _this2.state = CHANNEL_STATES.errored;
-      _this2.rejoinTimer.setTimeout();
+      _this2.rejoinTimer.scheduleTimeout();
     });
     this.joinPush.receive("timeout", function () {
       if (_this2.state !== CHANNEL_STATES.joining) {
@@ -287,7 +288,7 @@ var Channel = exports.Channel = (function () {
 
       _this2.socket.log("channel", "timeout " + _this2.topic, _this2.joinPush.timeout);
       _this2.state = CHANNEL_STATES.errored;
-      _this2.rejoinTimer.setTimeout();
+      _this2.rejoinTimer.scheduleTimeout();
     });
     this.on(CHANNEL_EVENTS.reply, function (payload, ref) {
       _this2.trigger(_this2.replyEventName(ref), payload);
@@ -297,7 +298,7 @@ var Channel = exports.Channel = (function () {
   _createClass(Channel, [{
     key: "rejoinUntilConnected",
     value: function rejoinUntilConnected() {
-      this.rejoinTimer.setTimeout();
+      this.rejoinTimer.scheduleTimeout();
       if (this.socket.isConnected()) {
         this.rejoin();
       }
@@ -630,7 +631,7 @@ var Socket = exports.Socket = (function () {
       this.log("transport", "close", event);
       this.triggerChanError();
       clearInterval(this.heartbeatTimer);
-      this.reconnectTimer.setTimeout();
+      this.reconnectTimer.scheduleTimeout();
       this.stateChangeCallbacks.close.forEach(function (callback) {
         return callback(event);
       });
@@ -978,10 +979,10 @@ Ajax.states = { complete: 4 };
 //    let reconnectTimer = new Timer(() => this.connect(), function(tries){
 //      return [1000, 5000, 10000][tries - 1] || 10000
 //    })
-//    reconnectTimer.setTimeout() // fires after 1000
-//    reconnectTimer.setTimeout() // fires after 5000
+//    reconnectTimer.scheduleTimeout() // fires after 1000
+//    reconnectTimer.scheduleTimeout() // fires after 5000
 //    reconnectTimer.reset()
-//    reconnectTimer.setTimeout() // fires after 1000
+//    reconnectTimer.scheduleTimeout() // fires after 1000
 //
 
 var Timer = (function () {
@@ -1001,21 +1002,11 @@ var Timer = (function () {
       clearTimeout(this.timer);
     }
 
-    // Cancels any previous setTimeout and schedules callback
+    // Cancels any previous scheduleTimeout and schedules callback
 
   }, {
-    key: "setTimeout",
-    value: (function (_setTimeout) {
-      function setTimeout() {
-        return _setTimeout.apply(this, arguments);
-      }
-
-      setTimeout.toString = function () {
-        return _setTimeout.toString();
-      };
-
-      return setTimeout;
-    })(function () {
+    key: "scheduleTimeout",
+    value: function scheduleTimeout() {
       var _this12 = this;
 
       clearTimeout(this.timer);
@@ -1024,7 +1015,7 @@ var Timer = (function () {
         _this12.tries = _this12.tries + 1;
         _this12.callback();
       }, this.timerCalc(this.tries + 1));
-    })
+    }
   }]);
 
   return Timer;

@@ -39,8 +39,9 @@
 //
 // ## Joining
 //
-// Joining a channel with `channel.join(topic, params)`, binds the params to
-// `channel.params`. Subsequent rejoins will send up the modified params for
+// Creating a channel with `socket.channel(topic, params)`, binds the params to
+// `channel.params`, which are sent up on `channel.join()`.
+// Subsequent rejoins will send up the modified params for
 // updating authorization params, or passing up last_message_id information.
 // Successful joins receive an "ok" status, while unsuccessful joins
 // receive "error".
@@ -52,7 +53,7 @@
 // can be done with `channel.push(eventName, payload)` and we can optionally
 // receive responses from the push. Additionally, we can use
 // `receive("timeout", callback)` to abort waiting for our other `receive` hooks
-//  and take action after some period of waiting.
+//  and take action after some period of waiting. The default timeout is 5000ms.
 //
 //
 // ## Socket Hooks
@@ -227,14 +228,14 @@ export class Channel {
     this.onError( reason => {
       this.socket.log("channel", `error ${this.topic}`, reason)
       this.state = CHANNEL_STATES.errored
-      this.rejoinTimer.setTimeout()
+      this.rejoinTimer.scheduleTimeout()
     })
     this.joinPush.receive("timeout", () => {
       if(this.state !== CHANNEL_STATES.joining){ return }
 
       this.socket.log("channel", `timeout ${this.topic}`, this.joinPush.timeout)
       this.state = CHANNEL_STATES.errored
-      this.rejoinTimer.setTimeout()
+      this.rejoinTimer.scheduleTimeout()
     })
     this.on(CHANNEL_EVENTS.reply, (payload, ref) => {
       this.trigger(this.replyEventName(ref), payload)
@@ -242,7 +243,7 @@ export class Channel {
   }
 
   rejoinUntilConnected(){
-    this.rejoinTimer.setTimeout()
+    this.rejoinTimer.scheduleTimeout()
     if(this.socket.isConnected()){
       this.rejoin()
     }
@@ -451,7 +452,7 @@ export class Socket {
     this.log("transport", "close", event)
     this.triggerChanError()
     clearInterval(this.heartbeatTimer)
-    this.reconnectTimer.setTimeout()
+    this.reconnectTimer.scheduleTimeout()
     this.stateChangeCallbacks.close.forEach( callback => callback(event) )
   }
 
@@ -699,10 +700,10 @@ Ajax.states = {complete: 4}
 //    let reconnectTimer = new Timer(() => this.connect(), function(tries){
 //      return [1000, 5000, 10000][tries - 1] || 10000
 //    })
-//    reconnectTimer.setTimeout() // fires after 1000
-//    reconnectTimer.setTimeout() // fires after 5000
+//    reconnectTimer.scheduleTimeout() // fires after 1000
+//    reconnectTimer.scheduleTimeout() // fires after 5000
 //    reconnectTimer.reset()
-//    reconnectTimer.setTimeout() // fires after 1000
+//    reconnectTimer.scheduleTimeout() // fires after 1000
 //
 class Timer {
   constructor(callback, timerCalc){
@@ -717,8 +718,8 @@ class Timer {
     clearTimeout(this.timer)
   }
 
-  // Cancels any previous setTimeout and schedules callback
-  setTimeout(){
+  // Cancels any previous scheduleTimeout and schedules callback
+  scheduleTimeout(){
     clearTimeout(this.timer)
 
     this.timer = setTimeout(() => {
