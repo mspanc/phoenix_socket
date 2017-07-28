@@ -1,6 +1,6 @@
 {
   "name": "phoenix-socket",
-  "version": "1.2.3",
+  "version": "1.3.0-rc.3",
   "description": "Socket API for accessing Phoenix Framework's Channels",
   "main": "dist/socket.js",
   "jsnext:main": "vendor/socket.js",
@@ -24,8 +24,8 @@
   },
   "homepage": "https://github.com/mspanc/phoenix_socket#readme",
   "devDependencies": {
-    "babel-preset-es2015": "^6.1.18",
-    "gulp": "^3.9.0",
-    "gulp-babel": "^6.1.1"
+    "babel-preset-es2015": "^6.24.1",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2"
   }
 }
