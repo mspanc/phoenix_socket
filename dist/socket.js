@@ -523,6 +523,7 @@ var Channel = exports.Channel = function () {
     key: "rejoin",
     value: function rejoin() {
       var timeout = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.timeout;
+
       if (this.isLeaving()) {
         return;
       }
@@ -750,7 +751,7 @@ var Socket = exports.Socket = function () {
       this.log("transport", "connected to " + this.endPointURL(), this.transport.prototype);
       this.flushSendBuffer();
       this.reconnectTimer.reset();
-      if (!this.conn.skipHeartbeat) {
+      if (this.conn && !this.conn.skipHeartbeat) {
         clearInterval(this.heartbeatTimer);
         this.heartbeatTimer = setInterval(function () {
           return _this6.sendHeartbeat();
