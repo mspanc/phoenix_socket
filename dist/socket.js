@@ -523,7 +523,6 @@ var Channel = exports.Channel = function () {
     key: "rejoin",
     value: function rejoin() {
       var timeout = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.timeout;
-
       if (this.isLeaving()) {
         return;
       }
