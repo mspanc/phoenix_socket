@@ -541,7 +541,7 @@ export class Socket {
     this.log("transport", `connected to ${this.endPointURL()}`, this.transport.prototype)
     this.flushSendBuffer()
     this.reconnectTimer.reset()
-    if(!this.conn.skipHeartbeat){
+    if(this.conn && !this.conn.skipHeartbeat){
       clearInterval(this.heartbeatTimer)
       this.heartbeatTimer = setInterval(() => this.sendHeartbeat(), this.heartbeatIntervalMs)
     }
